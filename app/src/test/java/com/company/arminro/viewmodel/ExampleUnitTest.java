@@ -1,4 +1,4 @@
-package com.company.arminro.barcodescanner;
+package com.company.arminro.viewmodel;
 
 import org.junit.Test;
 

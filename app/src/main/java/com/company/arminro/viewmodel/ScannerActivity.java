@@ -1,15 +1,26 @@
-package com.company.arminro.barcodescanner;
+package com.company.arminro.viewmodel;
 
+
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 
+/*camera functionality code is courtesy of
+* https://developer.android.com/guide/topics/media/camera.html#custom-camera
+* */
 public class ScannerActivity extends AppCompatActivity {
+
+    private Camera mCamera;
+    private Preview mPreview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +39,12 @@ public class ScannerActivity extends AppCompatActivity {
             }
         });
         setTitle("QR Scanner");
+
+        mCamera = getCameraInstance();
+        // setting the camera
+        mPreview = new Preview(this, mCamera);
+        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        preview.addView(mPreview);
     }
 
     @Override
@@ -50,5 +67,23 @@ public class ScannerActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+    }
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try {
+            c = Camera.open(); // attempt to get a Camera instance
+            Log.println(1, "CAM", "CAMERA CAPTURED");
+        }
+        catch (Exception e){
+            Log.e("CAM", "Could not start the camera: " + e.getMessage());
+        }
+        return c; // returns null if camera is unavailable
     }
 }
