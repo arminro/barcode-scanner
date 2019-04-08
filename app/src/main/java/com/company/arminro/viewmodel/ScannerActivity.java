@@ -18,17 +18,20 @@ import com.company.arminro.logic.BarcodeData;
 import com.company.arminro.logic.BarcodeDetector;
 import com.company.arminro.logic.BarcodeImage;
 import com.google.firebase.FirebaseApp;
+import com.google.zxing.Result;
+
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 /*camera functionality code is courtesy of
 * https://developer.android.com/guide/topics/media/camera.html#custom-camera
 * */
-public class ScannerActivity extends AppCompatActivity {
+public class ScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
 
     private Camera mCamera;
     private Preview mPreview;
     private Bitmap tempBmp;
     private static int cameraId;
-
+    private ZXingScannerView mScannerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -50,11 +53,12 @@ public class ScannerActivity extends AppCompatActivity {
         });
         setTitle("QR Scanner");
 
-        mCamera = getCameraInstance();
+        //mCamera = getCameraInstance();
         // setting the camera
-        mPreview = new Preview(this, mCamera);
+        //mPreview = new Preview(this, mCamera);
+        mScannerView = new ZXingScannerView(this);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-        preview.addView(mPreview);
+        preview.addView(mScannerView);
     }
 
     @Override
@@ -87,7 +91,8 @@ public class ScannerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        mScannerView.setResultHandler(this);
+        mScannerView.startCamera();
 
     }
     public static Camera getCameraInstance(){
@@ -146,10 +151,14 @@ public class ScannerActivity extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
         releaseTempFiles(); // we only need the temp files for the instance of capturing the picture
+        mScannerView.stopCamera();
     }
 
 
+    @Override
+    public void handleResult(Result rawResult) {
+        Toast.makeText(this, "Contents = " + rawResult.getText() +
+                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
 
-
-
+    }
 }
