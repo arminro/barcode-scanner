@@ -63,8 +63,8 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
 
         setContentView(R.layout.activity_scanner);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-        FirebaseApp.initializeApp(this);
+        setSupportActionBar(toolbar);
+
 
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -128,6 +128,11 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            // for this simple app, we will send the value of the boolean flag and set it in the settings activity
+            Intent intent = new Intent(this, SettingsActivity.class);
+            intent.putExtra(getString(R.string.browse_automatically), openUrlAutomatically);
+            startActivity(intent);
             return true;
         }
 
@@ -138,12 +143,9 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
     protected void onResume() {
         super.onResume();
 
-
+        openUrlAutomatically = getIntent().getBooleanExtra(getString(R.string.browse_automatically), false);
         mScannerView.startCamera(cameraId);
         mScannerView.setResultHandler(this);
-
-
-
     }
     public static int getCameraId(){
         Camera c = null;
@@ -210,7 +212,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
     @Override
     public void handleResult(Result rawResult) {
 
-        if (fab.isPressed()) {
+        if (rawResult.getText() != null && !rawResult.getText().isEmpty() && fab.isPressed() ) {
 
             final String text = rawResult.getText();
             urlTextView.setText(text);
@@ -218,7 +220,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                 imgView.setImageResource(R.drawable.net);
 
                 if(openUrlAutomatically){
-                    //  create an async call with a convenient delay
+                    // create an async call with a convenient delay
                     // https://stackoverflow.com/questions/10882611/how-to-make-a-delayed-non-blocking-function-call
 
                     ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
