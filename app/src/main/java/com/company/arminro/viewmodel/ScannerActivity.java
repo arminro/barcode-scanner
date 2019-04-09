@@ -4,16 +4,12 @@ package com.company.arminro.viewmodel;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -25,14 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.company.arminro.logic.BarcodeData;
-import com.company.arminro.logic.BarcodeDetector;
-import com.company.arminro.logic.BarcodeImage;
-import com.google.firebase.FirebaseApp;
 import com.google.zxing.Result;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
-import com.journeyapps.barcodescanner.CaptureActivity;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -45,8 +34,6 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 public class ScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
 
     private Camera mCamera;
-    private Preview mPreview;
-    private Bitmap tempBmp;
     private static int cameraId;
     private ZXingScannerView mScannerView;
     private FloatingActionButton fab;
@@ -65,8 +52,6 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,7 +60,6 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
             }
         });
         browserControl = new BrowserControl(this);
-
 
 
         // subscribing to the event of the browser control
@@ -94,16 +78,13 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         });
         setTitle("QR Scanner");
         cameraId = getCameraId();
-        //mCamera = getCameraInstance();
-        // setting the camera
-        //mPreview = new Preview(this, mCamera);
+
         mScannerView = new ZXingScannerView(this);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         urlTextView = (TextView)findViewById(R.id.urlTextView);
         imgView = (ImageView) findViewById(R.id.contentImage);
 
         preview.addView(mScannerView);
-
 
     }
 
@@ -114,10 +95,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         return true;
     }
 
-    // todo: this might not be needed
-    private void releaseTempFiles(){
-        tempBmp = null;
-    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -157,8 +135,6 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
                 info = new Camera.CameraInfo();
                 Camera.getCameraInfo(i, info);
                 if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                    //c = Camera.open(i); // attempt to get the back camera instance
-                    //cameraId = i;
                     Log.println(1, "CAM", "CAMERA CAPTURED");
                     break;
                 }
@@ -173,38 +149,12 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
 
 
 
-    // capturing the image in a temp file for reuse
-    private Camera.PictureCallback mPic = new Camera.PictureCallback(){
 
-        @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
-            try {
-                //tempBmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                Camera.CameraInfo info = new Camera.CameraInfo();
-                Camera.getCameraInfo(cameraId, info);
-
-                BarcodeImage img = new BarcodeImage(data, info);
-                Toast.makeText(ScannerActivity.this, "Image captured", Toast.LENGTH_SHORT).show();
-                BarcodeDetector detector = new BarcodeDetector(ScannerActivity.this);
-                BarcodeData barcodeData =  detector.Detect(img);
-                if (barcodeData.getException() != null){
-                    Toast.makeText(ScannerActivity.this, "Captured: " + barcodeData.getData(), Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Toast.makeText(ScannerActivity.this, "Captured: " + barcodeData.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
 
 
     @Override
     protected void onPause(){
         super.onPause();
-        releaseTempFiles(); // we only need the temp files for the instance of capturing the picture
         mScannerView.stopCamera();
     }
 
