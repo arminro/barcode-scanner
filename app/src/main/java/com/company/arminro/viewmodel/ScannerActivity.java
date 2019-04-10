@@ -1,6 +1,7 @@
 package com.company.arminro.viewmodel;
 
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -9,6 +10,8 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.zxing.Result;
 
@@ -37,13 +41,12 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
     private ImageView imgView;
     private boolean openUrlAutomatically;
     private BrowserControl browserControl;
-    private ScannerActivity instance;
+    private static final int CAMERA_PERMISSION =719;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        instance = this;
         openUrlAutomatically = false;
 
         setContentView(R.layout.activity_scanner);
@@ -122,8 +125,17 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         super.onResume();
 
         openUrlAutomatically = getIntent().getBooleanExtra(getString(R.string.browse_automatically), false);
-        mScannerView.startCamera(cameraId);
-        mScannerView.setResultHandler(this);
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            mScannerView.startCamera(cameraId);
+            mScannerView.setResultHandler(this);
+        }
+        else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    CAMERA_PERMISSION);
+        }
     }
     public static int getCameraId(){
         Camera c = null;
@@ -198,6 +210,25 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
     }
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+    String[] permissions, int[] grantResults){
+       switch (requestCode){
+           case CAMERA_PERMISSION: {
+               if (grantResults.length > 0
+                       && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                   mScannerView.startCamera(cameraId);
+                   mScannerView.setResultHandler(this);
 
+               } else {
+                   Toast.makeText(this, "Please provide the following permission: "+ Manifest.permission.CAMERA, Toast.LENGTH_LONG);
+                   this.finishAffinity();
+               }
+               return;
+           }
+
+        }
+
+    }
 
 }
