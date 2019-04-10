@@ -1,4 +1,10 @@
 <resources>
-    <string name="app_name">BarcodeScanner</string>
+    <string name="app_name">QR code scanner</string>
     <string name="action_settings">Settings</string>
+    <string name="browse_automatically">browse</string>
+
+    <!--Settings -->
+    <string name="title_activity_settings">Settings</string>
+    <!--Settings -->
+    <string name="pref_browse_auto">Launch browser automatically</string>
 </resources>
