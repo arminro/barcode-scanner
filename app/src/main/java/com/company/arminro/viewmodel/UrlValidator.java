@@ -1,9 +1,5 @@
 package com.company.arminro.viewmodel;
 
-import android.net.Uri;
-
-import javax.xml.validation.Validator;
-
 public class UrlValidator {
 
 

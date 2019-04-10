@@ -1,10 +1,8 @@
 package com.company.arminro.viewmodel;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.widget.CompoundButton;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Switch;
 
 public class SettingsActivity extends AppCompatActivity {

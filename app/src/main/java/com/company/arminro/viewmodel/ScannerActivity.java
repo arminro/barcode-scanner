@@ -4,7 +4,6 @@ package com.company.arminro.viewmodel;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -13,13 +12,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.zxing.Result;
 
@@ -28,9 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-/*camera functionality code is courtesy of
-* https://developer.android.com/guide/topics/media/camera.html#custom-camera
-* */
+
 public class ScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
 
     private Camera mCamera;
@@ -41,11 +37,13 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
     private ImageView imgView;
     private boolean openUrlAutomatically;
     private BrowserControl browserControl;
+    private ScannerActivity instance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        instance = this;
         openUrlAutomatically = false;
 
         setContentView(R.layout.activity_scanner);
@@ -56,9 +54,11 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // empty handler for capturing click event
             }
         });
+
+
         browserControl = new BrowserControl(this);
 
 
@@ -148,10 +148,6 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
     }
 
 
-
-
-
-
     @Override
     protected void onPause(){
         super.onPause();
@@ -162,6 +158,7 @@ public class ScannerActivity extends AppCompatActivity implements ZXingScannerVi
     @Override
     public void handleResult(Result rawResult) {
 
+        //Toast.makeText(this, "Handled", Toast.LENGTH_SHORT);
         if (rawResult.getText() != null && !rawResult.getText().isEmpty() && fab.isPressed() ) {
 
             final String text = rawResult.getText();

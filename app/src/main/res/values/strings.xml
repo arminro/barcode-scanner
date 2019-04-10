@@ -3,14 +3,8 @@
     <string name="action_settings">Settings</string>
     <string name="browse_automatically">browse</string>
 
-
-
-
-
     <!--Settings -->
     <string name="title_activity_settings">Settings</string>
+    <!--Settings -->
     <string name="pref_browse_auto">Launch browser automatically</string>
-    <string name="pref_browse_auto_descr">When this setting is enabled, the browser will automatically open if a valid internet address is scanned</string>
-
-
 </resources>
